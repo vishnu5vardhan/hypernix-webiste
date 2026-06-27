@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Magnetic } from "@/components/MotionPrimitives";
 
 interface HeaderProps {
   homeHref?: string;
@@ -14,9 +15,11 @@ export default function Header({ homeHref = "/" }: HeaderProps) {
         <Link href={`${homeHref === "/" ? "" : homeHref}#work`}>Work</Link>
         <Link href={`${homeHref === "/" ? "" : homeHref}#process`}>Process</Link>
       </nav>
-      <Link className="header-cta" href={`${homeHref === "/" ? "" : homeHref}#contact`}>
-        Find the leaks <span aria-hidden="true">↗</span>
-      </Link>
+      <div className="header-cta-wrapper">
+        <Link className="header-cta" href={`${homeHref === "/" ? "" : homeHref}#contact`}>
+          Find the leaks <span aria-hidden="true">↗</span>
+        </Link>
+      </div>
     </header>
   );
 }

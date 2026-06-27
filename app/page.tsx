@@ -7,6 +7,7 @@ import {
   useTransform,
   useSpring,
   useInView,
+  useReducedMotion,
 } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -17,7 +18,10 @@ import {
   staggerItem,
   WordReveal,
   ease,
+  ScrambleText,
+  ScannerReveal
 } from "@/components/MotionPrimitives";
+import SystemTicker from "@/components/SystemTicker";
 
 const WA_LINK =
   "https://wa.me/919398840252?text=Hello%20Hypernix,%20I'd%20like%20to%20audit%20our%20operations%20and%20find%20workflow%20leaks.";
@@ -97,71 +101,43 @@ function Hero() {
     target: heroRef,
     offset: ["start start", "end start"],
   });
-  const rawY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const heroY = useSpring(rawY, { stiffness: 55, damping: 18 });
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
-  const heroOpacity = useSpring(rawOpacity, { stiffness: 80, damping: 24 });
-
-  /* ticker opposite-direction parallax */
-  const tickerRef = useRef(null);
-  const { scrollYProgress: tickerProgress } = useScroll({
-    target: tickerRef,
-    offset: ["start end", "end start"],
-  });
-  const tickerX = useTransform(tickerProgress, [0, 1], ["0%", "-10%"]);
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
+  const shouldReduceMotion = useReducedMotion();
+  
+  const initialTransform = shouldReduceMotion ? "translateY(0px)" : "translateY(12px)";
 
   return (
     <section className="hero section" ref={heroRef}>
       <motion.div
         className="hero-grid"
-        style={{ y: heroY, opacity: heroOpacity }}
+        style={{ y: heroY, opacity: heroOpacity, alignItems: "flex-start", textAlign: "left" }}
       >
-        <h1 className="hero-title">
-          {["Stop running", "the business", "from the", "owner's head."].map(
-            (line, i) => (
-              <motion.span
-                key={i}
-                style={{ display: "block" }}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.72, delay: 0.08 + i * 0.11, ease }}
-              >
-                {line}
-              </motion.span>
-            )
-          )}
-        </h1>
-        <motion.p
-          className="hero-copy"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.56, ease }}
+        <motion.div
+          initial={{ opacity: 0, transform: initialTransform }}
+          animate={{ opacity: 1, transform: "translateY(0px)" }}
+          transition={{ duration: 0.28, ease }}
+          style={{ width: "100%" }}
         >
-          Internal systems for growing companies<br />
-          outgrowing memory, calls, and follow-ups.
-        </motion.p>
-      </motion.div>
-
-      <motion.div
-        ref={tickerRef}
-        className="signal-rail"
-        aria-label="Operational leak signals"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.72 }}
-      >
-        <div className="rail-arrow" aria-hidden="true">→</div>
-        <div className="ticker">
-          <motion.div className="ticker-track" style={{ x: tickerX }}>
-            {tickerItems.map((item, i) => (
-              <span key={`a${i}`}>{item}<i> /</i></span>
-            ))}
-            {tickerItems.map((item, i) => (
-              <span key={`b${i}`}>{item}<i> /</i></span>
-            ))}
-          </motion.div>
-        </div>
-        <div className="rail-arrow" aria-hidden="true">→</div>
+          <h1 className="hero-title hero-title--home">
+            Stop running the business from the owner’s head.
+          </h1>
+          <motion.p
+            className="hero-copy"
+            initial={{ opacity: 0, transform: initialTransform }}
+            animate={{ opacity: 1, transform: "translateY(0px)" }}
+            transition={{ duration: 0.28, delay: 0.12, ease }}
+            style={{ margin: "24px 0 0" }}
+          >
+            Internal systems for growing companies outgrowing <span className="redact-word">memory</span>, <span className="redact-word">calls</span>, <span className="redact-word">WhatsApp</span>, <span className="redact-word">Excel</span>, and manual follow-ups.
+          </motion.p>
+          
+          <div className="hero-cta-wrapper">
+              <Link className="primary-btn" href="#work">
+                See how we work <span aria-hidden="true">→</span>
+              </Link>
+          </div>
+        </motion.div>
       </motion.div>
     </section>
   );
@@ -171,41 +147,40 @@ function Hero() {
 function FinalCTA() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.25 });
+  const shouldReduceMotion = useReducedMotion();
+  
+  const initialTransformH2 = shouldReduceMotion ? "translateY(0px) scale(1)" : "translateY(12px) scale(0.96)";
+  const initialTransformP = shouldReduceMotion ? "translateY(0px)" : "translateY(12px)";
 
   return (
     <section id="contact" className="final-cta" ref={ref}>
       <motion.h2
-        initial={{ opacity: 0, scale: 0.95, y: 28 }}
-        animate={inView ? { opacity: 1, scale: 1, y: 0 } : {}}
-        transition={{ duration: 0.78, ease }}
+        initial={{ opacity: 0, transform: initialTransformH2 }}
+        animate={inView ? { opacity: 1, transform: "translateY(0px) scale(1)" } : { opacity: 0, transform: initialTransformH2 }}
+        transition={{ duration: 0.28, ease }}
       >
         Find the leaks.<br />Fix the system.<br />Grow on purpose.
       </motion.h2>
 
-      <motion.div
-        className="cta-copy"
-        initial={{ opacity: 0, y: 22 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.65, delay: 0.2, ease }}
-      >
-        <p>
-          Show us how your business runs today. We'll map what is slowing you
-          down and what system should be built.
-        </p>
-        <div className="cta-actions">
-          <motion.a
-            className="primary-btn"
-            href={WA_LINK}
-            target="_blank"
-            rel="noreferrer"
-            whileHover={{ y: -3, scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ duration: 0.18 }}
-          >
-            Talk on WhatsApp <span aria-hidden="true">↗</span>
-          </motion.a>
+      <div className="cta-copy" style={{ marginTop: "24px", marginBottom: "48px" }}>
+        <ScannerReveal delay={0.1}>
+          <p>
+            Show us how your business runs today. We'll map what is slowing you
+            down and what system should be built.
+          </p>
+        </ScannerReveal>
+      </div>
+      
+      <div className="cta-actions">
+            <a
+              className="primary-btn"
+              href={WA_LINK}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Talk on WhatsApp <span aria-hidden="true">↗</span>
+            </a>
         </div>
-      </motion.div>
     </section>
   );
 }
@@ -279,7 +254,6 @@ export default function Home() {
                 className="system-strip"
                 key={s.label}
                 variants={staggerItem}
-                whileHover={{ scale: 1.012, transition: { duration: 0.2 } }}
               >
                 <span>{s.label}</span>
                 <p>{s.body}</p>
@@ -291,20 +265,18 @@ export default function Home() {
         {/* Case files */}
         <section id="work" className="section case-files">
           <div className="case-heading">
-            <FadeUp as="h2">Case Files</FadeUp>
+            <FadeUp as="h2">Case Studies</FadeUp>
             <FadeUp delay={0.12}>
               <p>Real businesses. Real systems. Real operating problems.</p>
             </FadeUp>
           </div>
 
-          <StaggerList className="case-list-grid" stagger={0.08} amount={0.04}>
+          <StaggerList className="case-list-grid" stagger={0.05} amount={0.04}>
             {cases.map((c) => (
               <motion.div
                 key={c.num}
                 variants={staggerItem}
-                whileHover={{ y: -8, boxShadow: "8px 8px 0px #15110d" }}
-                transition={{ duration: 0.26, ease }}
-                style={{ borderRadius: 12 }}
+                style={{ height: "100%" }}
               >
                 <Link
                   className="case-card-yellow"
@@ -316,9 +288,9 @@ export default function Home() {
                       <span className="case-number">{c.num}</span>
                       <small>{c.tag}</small>
                     </div>
-                    <h3>{c.title}</h3>
-                    <p>{c.body}</p>
-                    <b>Read case ↗</b>
+                    <h3><ScrambleText text={c.title} delay={0.15 + parseInt(c.num) * 0.05} /></h3>
+                    <p style={{ opacity: 0.8, marginTop: '8px', fontSize: 'clamp(14px, 1.1vw, 16px)' }}>{c.body}</p>
+                    <b style={{ marginTop: 'auto', display: 'inline-block', paddingTop: '24px' }}>Read case study ↗</b>
                   </div>
                 </Link>
               </motion.div>
@@ -327,7 +299,7 @@ export default function Home() {
         </section>
 
         {/* Process */}
-        <section id="process" className="section process-section">
+        <section id="process" className="section process-section blueprint-bg">
           <FadeUp as="h2" className="section-title">
             Find the leak. Build the system. Improve it monthly.
           </FadeUp>
@@ -354,7 +326,6 @@ export default function Home() {
                 className="process-card"
                 key={card.num}
                 variants={staggerItem}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
               >
                 <span>{card.num}</span>
                 <h3>{card.title}</h3>
@@ -363,6 +334,8 @@ export default function Home() {
             ))}
           </StaggerList>
         </section>
+
+        <SystemTicker />
 
         {/* Final CTA */}
         <FinalCTA />
