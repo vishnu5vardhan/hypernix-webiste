@@ -49,13 +49,6 @@ export default function LeadFormModal({ isOpen, onClose }: LeadFormModalProps) {
     data.append("phone", phone);
 
     try {
-      if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
-        // Mock submission if script URL isn't set yet
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setStatus("success");
-        return;
-      }
-
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: data,
