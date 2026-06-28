@@ -16,9 +16,9 @@ export default function Header({ homeHref = "/" }: HeaderProps) {
         <Link href={`${homeHref === "/" ? "" : homeHref}#process`}>Process</Link>
       </nav>
       <div className="header-cta-wrapper">
-        <Link className="header-cta" href={`${homeHref === "/" ? "" : homeHref}#contact`}>
-          Find the leaks <span aria-hidden="true">↗</span>
-        </Link>
+        <a className="header-cta" href="tel:+919398840252">
+          Call Us <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </header>
   );

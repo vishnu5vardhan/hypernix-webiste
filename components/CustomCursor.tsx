@@ -30,6 +30,12 @@ export default function CustomCursor() {
         setHoverText("VIEW");
         setIsHovered(true);
       } else if (
+        target.tagName.toLowerCase() === "input" ||
+        target.tagName.toLowerCase() === "textarea"
+      ) {
+        setHoverText("TYPE");
+        setIsHovered(true);
+      } else if (
         target.tagName.toLowerCase() === "a" ||
         target.tagName.toLowerCase() === "button" ||
         target.closest("a") ||
@@ -64,7 +70,7 @@ export default function CustomCursor() {
         height: 24,
         backgroundColor: "var(--rust)",
         pointerEvents: "none",
-        zIndex: 10000,
+        zIndex: 9999999,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

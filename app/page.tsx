@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   motion,
   useScroll,
@@ -22,6 +22,7 @@ import {
   ScannerReveal
 } from "@/components/MotionPrimitives";
 import SystemTicker from "@/components/SystemTicker";
+import LeadFormModal from "@/components/LeadFormModal";
 
 const WA_LINK =
   "https://wa.me/919398840252?text=Hello%20Hypernix,%20I'd%20like%20to%20audit%20our%20operations%20and%20find%20workflow%20leaks.";
@@ -95,23 +96,42 @@ const tickerItems = [
 ];
 
 /* ── Hero with parallax ── */
-function Hero() {
+function Hero({ onOpenForm }: { onOpenForm: () => void }) {
   const heroRef = useRef(null);
+  const [hasResolvedNoise, setHasResolvedNoise] = useState(false);
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
+  
+  // Track if we've scrolled past the threshold to permanently disable the noise
+  useEffect(() => {
+    return scrollYProgress.onChange((latest) => {
+      if (latest > 0.65 && !hasResolvedNoise) {
+        setHasResolvedNoise(true);
+      }
+    });
+  }, [scrollYProgress, hasResolvedNoise]);
+
+  const rawHeroOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
   const shouldReduceMotion = useReducedMotion();
   
   const initialTransform = shouldReduceMotion ? "translateY(0px)" : "translateY(12px)";
 
   return (
-    <section className="hero section" ref={heroRef}>
+    <section className="hero section" ref={heroRef} style={{ position: "relative" }}>
+      {/* ── Localized CRT Noise ── */}
+      <motion.div 
+        className="crt-noise" 
+        aria-hidden="true" 
+        style={{ opacity: hasResolvedNoise ? 0 : rawHeroOpacity }}
+      />
+      
       <motion.div
         className="hero-grid"
-        style={{ y: heroY, opacity: heroOpacity, alignItems: "flex-start", textAlign: "left" }}
+        style={{ y: heroY, opacity: rawHeroOpacity, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}
       >
         <motion.div
           initial={{ opacity: 0, transform: initialTransform }}
@@ -119,7 +139,7 @@ function Hero() {
           transition={{ duration: 0.28, ease }}
           style={{ width: "100%" }}
         >
-          <h1 className="hero-title hero-title--home">
+          <h1 className="hero-title hero-title--home" style={{ textAlign: "center", margin: "0 auto", width: "100%", display: "block" }}>
             Stop running the business from the owner’s head.
           </h1>
           <motion.p
@@ -127,15 +147,15 @@ function Hero() {
             initial={{ opacity: 0, transform: initialTransform }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             transition={{ duration: 0.28, delay: 0.12, ease }}
-            style={{ margin: "24px 0 0" }}
+            style={{ margin: "24px auto 0", textAlign: "center", display: "block", width: "100%" }}
           >
             Internal systems for growing companies outgrowing <span className="redact-word">memory</span>, <span className="redact-word">calls</span>, <span className="redact-word">WhatsApp</span>, <span className="redact-word">Excel</span>, and manual follow-ups.
           </motion.p>
           
-          <div className="hero-cta-wrapper">
-              <Link className="primary-btn" href="#work">
-                See how we work <span aria-hidden="true">→</span>
-              </Link>
+          <div className="hero-cta-wrapper" style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: "40px" }}>
+              <button className="primary-btn" onClick={onOpenForm}>
+                Find the leaks <span aria-hidden="true">↗</span>
+              </button>
           </div>
         </motion.div>
       </motion.div>
@@ -148,6 +168,12 @@ function FinalCTA() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.25 });
   const shouldReduceMotion = useReducedMotion();
+  
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "center center"],
+  });
+  const ctaOpacity = useTransform(scrollYProgress, [0.4, 1], [0, 1]);
   
   const initialTransformH2 = shouldReduceMotion ? "translateY(0px) scale(1)" : "translateY(12px) scale(0.96)";
   const initialTransformP = shouldReduceMotion ? "translateY(0px)" : "translateY(12px)";
@@ -186,13 +212,15 @@ function FinalCTA() {
 }
 
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <>
       <Header />
       <main id="top">
 
         {/* Hero */}
-        <Hero />
+        <Hero onOpenForm={() => setIsModalOpen(true)} />
 
         {/* Leaks */}
         <section className="section leak-section">
@@ -215,6 +243,12 @@ export default function Home() {
               </motion.article>
             ))}
           </StaggerList>
+
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "48px" }}>
+            <button className="primary-btn" onClick={() => setIsModalOpen(true)}>
+              Find the leaks <span aria-hidden="true">↗</span>
+            </button>
+          </div>
         </section>
 
         {/* Control room */}
@@ -248,22 +282,26 @@ export default function Home() {
             <WordReveal text="Put the business into one system." />
           </FadeUp>
 
-          <StaggerList className="system-strip-list" stagger={0.1} delay={80} amount={0.05}>
+          <StaggerList className="neo-system-grid" stagger={0.1} delay={80} amount={0.05}>
             {systems.map((s) => (
               <motion.article
-                className="system-strip"
+                className="neo-system-card"
                 key={s.label}
                 variants={staggerItem}
               >
-                <span>{s.label}</span>
-                <p>{s.body}</p>
+                <div className="neo-system-header">
+                  <span>{s.label}</span>
+                </div>
+                <div className="neo-system-body">
+                  <p>{s.body}</p>
+                </div>
               </motion.article>
             ))}
           </StaggerList>
         </section>
 
         {/* Case files */}
-        <section id="work" className="section case-files">
+        <section className="section case-files" id="work">
           <div className="case-heading">
             <FadeUp as="h2">Case Studies</FadeUp>
             <FadeUp delay={0.12}>
@@ -342,6 +380,9 @@ export default function Home() {
       </main>
 
       <Footer homeHref="/" contactHref={WA_LINK} phone="+91 93988 40252" />
+      
+      {/* Global Modals */}
+      <LeadFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
 }

@@ -301,7 +301,7 @@ export function ScrambleText({ text, className, delay = 0 }: ScrambleTextProps) 
     }
 
     let frame = 0;
-    const totalFrames = 24;
+    const totalFrames = 8; // Sped up drastically to avoid looking like a broken glitch
     const delayMs = delay * 1000;
     let timeoutId: NodeJS.Timeout;
     let rafId: number;
