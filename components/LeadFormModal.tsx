@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // You will replace this with your actual Google Apps Script Web App URL
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdqjZRgwr5_T3X9Xe_xQ_UFKfpWAjxkRm4WUGZfquL1srO2JGKdLSWdlua-HEzx2JD/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyo_jg4-K6c3dKxEj2oHR1BFdb1Zfwr6EoV9Dn2MEhJT9ajUViiMRt85XHpTWjlJPKz/exec";
 
 interface LeadFormModalProps {
   isOpen: boolean;
